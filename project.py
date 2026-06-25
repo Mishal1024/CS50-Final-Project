@@ -13,6 +13,8 @@ try:
     data = open("data.json","r")
 except FileNotFoundError:
     data = open("data.json","w")
+    data.write('{\n\t"task":["Task","Priority","Completion"]\n\t"habit":\n\t"note":\n}')
+    data.close()
 
 
 def main():
