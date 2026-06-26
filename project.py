@@ -63,6 +63,9 @@ def main():
             case _:
                 print("Invalid Input")
                 pass
+    with open("data.json", "w") as file:
+        json.dump(data,file,indent=4)
+        file.close()
             
 
 def add_task():
