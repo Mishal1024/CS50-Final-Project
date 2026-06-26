@@ -37,9 +37,7 @@ def main():
                     task_menu_choice = input("Choice: ")
                     match task_menu_choice:
                         case "1":
-                            task = input("Task: ")
-                            priority = input("Priority: ")
-                            tasks.append(Task(task,priority).to_list())
+                            tasks = add_task(input("Task: "),input("Priority: "),tasks)
                         case "2":
                             tasks[int(input("Task Number: "))-1][2] = "Complete"
                         case "3":
@@ -50,6 +48,7 @@ def main():
                         case _:
                             print("Invalid Input")
                     print()
+                    data["task"] = tasks
             case "2":
                 print("Habits")
             case "3":
@@ -68,12 +67,13 @@ def main():
         file.close()
             
 
-def add_task():
-    ...
+def add_task(task,priority,tasks):
+    tasks.append(Task(task,priority).to_list())
+    return tasks
 
 
-def complete_task():
-    ...
+def complete_task(tasks):
+    return tasks
 
 
 
