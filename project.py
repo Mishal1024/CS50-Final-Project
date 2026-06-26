@@ -35,18 +35,18 @@ def main():
                 while True:
                     print(tabulate(tasks,headers =["Task","Priority","Completion"],tablefmt="grid"))
                     print()
-                    print("Tasks Menu\n1. Add Task\n2. Mark Complete\n3. Remove Completed\n4. Exit")
+                    print("Tasks Menu\n1. Add Task\n2. Mark Complete\n3. Mark Incomplete\n4. Remove Completed\n5. Exit")
                     task_menu_choice = input("Choice: ")
                     match task_menu_choice:
                         case "1":
-                            task = input("Task: ")
-                            priority = input("Priority: ")
-                            tasks.append(Task(task,priority).to_list())
+                            add_task(tasks)
                         case "2":
-                            tasks[int(input("Task Number: "))-1][2] = "Complete"
+                            mark_task(int(input("Task Number: ")),tasks)
                         case "3":
-                            tasks = [task for task in tasks if task[2] != "Complete"]
+                            unmark_task(int(input("Task Number: ")),tasks)
                         case "4":
+                            tasks = remove_marked(tasks)
+                        case "5":
                             print()
                             break
                         case _:
@@ -69,6 +69,20 @@ def main():
     with open("data.json", "w") as file:
         json.dump(data,file,indent=4)
         file.close()
+
+
+def add_task(tasks):
+    tasks.append(Task(input("Task: "),input("Priority: ")).to_list())
+
+def mark_task(i,tasks):
+    tasks[i-1][2] = "Complete"
+
+def unmark_task(i,tasks):
+    tasks[i-1][2] = "Incomplete"
+
+def remove_marked(tasks):
+    return [task for task in tasks if task[2] != "Complete"]
+
 
 
 if __name__ == "__main__":
