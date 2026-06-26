@@ -11,6 +11,7 @@ class Task():
     def to_list(self):
         return [self.task,self.priority,self.done]
     
+
 try:
     with open("data.json", "r") as file:
         data = json.load(file)
@@ -21,6 +22,7 @@ except FileNotFoundError:
         "note":[],
         "log":[]
     }
+
 
 def main():
     while True:
@@ -37,7 +39,9 @@ def main():
                     task_menu_choice = input("Choice: ")
                     match task_menu_choice:
                         case "1":
-                            tasks = add_task(input("Task: "),input("Priority: "),tasks)
+                            task = input("Task: ")
+                            priority = input("Priority: ")
+                            tasks.append(Task(task,priority).to_list())
                         case "2":
                             tasks[int(input("Task Number: "))-1][2] = "Complete"
                         case "3":
@@ -65,16 +69,6 @@ def main():
     with open("data.json", "w") as file:
         json.dump(data,file,indent=4)
         file.close()
-            
-
-def add_task(task,priority,tasks):
-    tasks.append(Task(task,priority).to_list())
-    return tasks
-
-
-def complete_task(tasks):
-    return tasks
-
 
 
 if __name__ == "__main__":
