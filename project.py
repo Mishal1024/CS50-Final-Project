@@ -1,4 +1,6 @@
 from tabulate import tabulate
+import json
+
 
 class Task():
     def __init__(self,task,priority):
@@ -10,12 +12,15 @@ class Task():
         return [self.task,self.priority,self.done]
     
 try:
-    data = open("data.json","r")
+    with open("data.json", "r") as file:
+        data = json.load(file)
 except FileNotFoundError:
-    data = open("data.json","w")
-    data.write('{\n\t"task":["Task","Priority","Completion"]\n\t"habit":\n\t"note":\n}')
-    data.close()
-
+    data = {
+        "task":[],
+        "habit":[],
+        "note":[],
+        "log":[]
+    }
 
 def main():
     while True:
@@ -24,9 +29,9 @@ def main():
         print()
         match main_menu_choice:
             case "1":
-                tasks = [["Task","Priority","Completion"]]
+                tasks = data["task"]
                 while True:
-                    print(tabulate(tasks,headers = "firstrow",tablefmt="grid"))
+                    print(tabulate(tasks,headers =["Task","Priority","Completion"],tablefmt="grid"))
                     print()
                     print("Tasks Menu\n1. Add Task\n2. Mark Complete\n3. Remove Completed\n4. Exit")
                     task_menu_choice = input("Choice: ")
@@ -36,7 +41,7 @@ def main():
                             priority = input("Priority: ")
                             tasks.append(Task(task,priority).to_list())
                         case "2":
-                            tasks[int(input("Task Number: "))][2] = "Complete"
+                            tasks[int(input("Task Number: "))-1][2] = "Complete"
                         case "3":
                             tasks = [task for task in tasks if task[2] != "Complete"]
                         case "4":
