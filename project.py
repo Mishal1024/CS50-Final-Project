@@ -7,7 +7,7 @@ import time
 
 
 
-class Task():
+class Task:
     def __init__(self,task,priority):
         self.task = task
         self.priority = priority
@@ -24,7 +24,7 @@ class Task():
         }
     
 
-class Habit():
+class Habit:
     def __init__(self,habit,frequency,target):
         self.habit = habit
         self.frequency = frequency
@@ -41,7 +41,7 @@ class Habit():
         }
     
 
-class Note():
+class Note:
     def __init__(self,title,content):
         self.title = title
         self.content = content
@@ -56,7 +56,7 @@ class Note():
         }
 
 
-class Log():
+class Log:
     def __init__(self,action,detail,time):
         self.action = action
         self.detail = detail
@@ -112,13 +112,15 @@ except (FileNotFoundError, json.JSONDecodeError):
     }
 
 
+f = Figlet(font = "standard")
+
+
 def main():
-    f = Figlet(font = "standard")
-    print(f.renderText("Productivity System"))
     tasks = data["task"]
     habits = data["habit"]
     notes = data["note"]
     logs = data["log"]
+    print(f.renderText("Productivity System"))
     while True:
         clear()
         print("Menu\n1. Tasks\n2. Habits\n3. Notes\n4. Logs\n5. Stats\n6. Exit")
@@ -136,7 +138,7 @@ def main():
                     task_menu_choice = input("Choice: ")
                     match task_menu_choice:
                         case "1":
-                            add_task(input("Task: "),input("Priority: "),tasks)
+                            add_task(input("Task: ").strip(),input("Priority: ").strip(),tasks)
                             add_log("Task Added",tasks[-1].task,logs)
                         case "2":
                             i = int_validation("Task Number: ",tasks)
@@ -154,7 +156,7 @@ def main():
                             for task in tasks:
                                 if task.done == "Complete":
                                     add_log("Task Removed",task.task,logs)
-                            tasks = remove_marked(tasks)
+                            tasks[:] = [task for task in tasks if task.done != "Complete"]
                             
                         case "5":
                             break
@@ -174,7 +176,7 @@ def main():
                     habit_menu_choice = input("Choice: ")
                     match habit_menu_choice:
                         case "1":
-                            add_habit(input("Habit: "),input("Frequency: "),input("Target: "),habits)
+                            add_habit(input("Habit: ").strip(),input("Frequency: ").strip(),input("Target: ").strip(),habits)
                             add_log("Habit Added",habits[-1].habit,logs)
                         case "2":
                             i = int_validation("Habit Number: ",habits)
@@ -200,7 +202,7 @@ def main():
                     note_menu_choice = input("Choice: ")
                     match note_menu_choice:
                         case "1":
-                            add_note(input("Title: "),input("Content: "),notes)
+                            add_note(input("Title: ").strip(),input("Content: ").strip(),notes)
                             add_log("Note Added",f"{notes[-1].title} - {notes[-1].content}",logs)
                         case "2":
                             i = int_validation("Note Number: ",notes)
@@ -251,8 +253,8 @@ def main():
                     print(f"Total Logs: {total_logs}")
                     print()
                     print("Stats Menu\n1. Exit")
-                    log_menu_choice = input("Choice: ")
-                    match log_menu_choice:
+                    stat_menu_choice = input("Choice: ")
+                    match stat_menu_choice:
                         case "1":
                             break
                         case _:
@@ -283,9 +285,6 @@ def mark_task(i,tasks):
 def unmark_task(i,tasks):
     tasks[i-1].done = "Incomplete"
 
-def remove_marked(tasks):
-    return [task for task in tasks if task.done != "Complete"]
-
 def add_habit(habit,frequency,target,habits):
     habits.append(Habit(habit,frequency,target))
 
@@ -312,10 +311,9 @@ def int_validation(prompt,items):
     except ValueError:
         invalid_input()
         return None
-    
+
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
-    f = Figlet(font = "standard")
     print(f.renderText("Productivity System"))
 
 def invalid_input():
