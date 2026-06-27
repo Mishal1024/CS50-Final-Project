@@ -1,6 +1,10 @@
 from tabulate import tabulate
 import json
 from datetime import datetime
+from pyfiglet import Figlet
+import os
+import time
+
 
 
 class Task():
@@ -88,7 +92,7 @@ try:
         
         temp = []
         for n in data["note"]:
-            note = Task(n["title"],n["note"])
+            note = Note(n["title"],n["content"])
             temp.append(note)
         data["note"] = temp
         
@@ -99,7 +103,7 @@ try:
         data["log"] = temp
         
 
-except FileNotFoundError:
+except (FileNotFoundError, json.JSONDecodeError):
     data = {
         "task":[],
         "habit":[],
@@ -109,18 +113,24 @@ except FileNotFoundError:
 
 
 def main():
+    f = Figlet(font = "standard")
+    print(f.renderText("Productivity System"))
     tasks = data["task"]
     habits = data["habit"]
     notes = data["note"]
     logs = data["log"]
     while True:
+        clear()
         print("Menu\n1. Tasks\n2. Habits\n3. Notes\n4. Logs\n5. Stats\n6. Exit")
         main_menu_choice = input("Choice: ")
-        print()
         match main_menu_choice:
             case "1":
                 while True:
-                    print(tabulate([task.to_list() for task in tasks],headers =["Task","Priority","Completion"],tablefmt="fancy_grid"))
+                    clear()
+                    if not tasks:
+                        print("No Tasks")
+                    else:
+                        print(tabulate([task.to_list() for task in tasks],headers =["Task","Priority","Completion"],tablefmt="fancy_grid"))
                     print()
                     print("Tasks Menu\n1. Add Task\n2. Mark Complete\n3. Mark Incomplete\n4. Remove Completed\n5. Exit")
                     task_menu_choice = input("Choice: ")
@@ -129,11 +139,15 @@ def main():
                             add_task(input("Task: "),input("Priority: "),tasks)
                             add_log("Task Added",tasks[-1].task,logs)
                         case "2":
-                            i = int(input("Task Number: "))
+                            i = int_validation("Task Number: ",tasks)
+                            if i is None:
+                                continue
                             mark_task(i,tasks)
                             add_log("Task Completed",tasks[i-1].task,logs)
                         case "3":
-                            i = int(input("Task Number: "))
+                            i = int_validation("Task Number: ",tasks)
+                            if i is None:
+                                continue
                             unmark_task(i,tasks)
                             add_log("Task Uncompleted",tasks[i-1].task,logs)
                         case "4":
@@ -143,16 +157,18 @@ def main():
                             tasks = remove_marked(tasks)
                             
                         case "5":
-                            print()
                             break
                         case _:
-                            print("Invalid Input")
-                    print()
+                            invalid_input()
                     data["task"] = tasks
 
             case "2":
                 while True:
-                    print(tabulate([habit.to_list() for habit in habits],headers=["Habit","Frequency","Target"],tablefmt="fancy_grid"))
+                    clear()
+                    if not habits:
+                        print("No habits")
+                    else:
+                        print(tabulate([habit.to_list() for habit in habits],headers=["Habit","Frequency","Target"],tablefmt="fancy_grid"))
                     print()
                     print("Habits Menu\n1. Add Habit\n2. Remove Habit\n3. Exit")
                     habit_menu_choice = input("Choice: ")
@@ -161,20 +177,24 @@ def main():
                             add_habit(input("Habit: "),input("Frequency: "),input("Target: "),habits)
                             add_log("Habit Added",habits[-1].habit,logs)
                         case "2":
-                            i = int(input("Task Number: "))
+                            i = int_validation("Habit Number: ",habits)
+                            if i is None:
+                                continue
                             add_log("Habit Removed",habits[i-1].habit,logs)
                             remove_habit(i,habits)
                         case "3":
-                            print()
                             break
                         case _:
-                            print("Invalid Input")
-                    print()
+                            invalid_input()
                     data["habit"] = habits
 
             case "3":
                 while True:
-                    print(tabulate([note.to_list() for note in notes],headers =["Title","Content"],tablefmt="fancy_grid"))
+                    clear()
+                    if not notes:
+                        print("No Notes")
+                    else:
+                        print(tabulate([note.to_list() for note in notes],headers =["Title","Content"],tablefmt="fancy_grid"))
                     print()
                     print("Notes Menu\n1. Add Note\n2. Remove Note\n3. Exit")
                     note_menu_choice = input("Choice: ")
@@ -183,54 +203,67 @@ def main():
                             add_note(input("Title: "),input("Content: "),notes)
                             add_log("Note Added",f"{notes[-1].title} - {notes[-1].content}",logs)
                         case "2":
-                            add_log("Note Removed",f"{notes[-1].title} - {notes[-1].content}",logs)
-                            remove_note(int(input("Note Number: ")),notes)
+                            i = int_validation("Note Number: ",notes)
+                            if i is None:
+                                continue
+                            add_log("Note Removed",f"{notes[i-1].title} - {notes[i-1].content}",logs)
+                            remove_note(i,notes)
                             
                         case "3":
-                            print()
                             break
                         case _:
-                            print("Invalid Input")
-                    print()
+                            invalid_input()
                     data["note"] = notes
 
             case "4":
                 while True:
-                    print(tabulate([[log.action,log.detail,log.time] for log in logs],headers =["Action","Detail","Time"],tablefmt="fancy_grid"))
+                    clear()
+                    if not logs:
+                        print("No Logs")
+                    else:
+                        print(tabulate([log.to_list() for log in logs],headers =["Action","Detail","Time"],tablefmt="fancy_grid"))
                     print()
                     print("Logs Menu\n1. Clear\n2. Exit")
                     log_menu_choice = input("Choice: ")
                     match log_menu_choice:
                         case "1":
-                            logs = []
+                            logs.clear()
                         case "2":
-                            print()
                             break
                         case _:
-                            print("Invalid Input")
-                    print()
+                            invalid_input()
                     data["log"] = logs
 
             case "5":
-                total_tasks = len(tasks)
-                completed_tasks = len([task for task in tasks if task.done == "Complete"])
-                total_habits = len(habits)
-                total_notes = len(notes)
-                total_logs = len(logs)
-                print("Stats")
-                print(f"Total Tasks: {total_tasks}")
-                print(f"Completed Tasks: {completed_tasks}")
-                print(f"Incomplete Tasks: {total_tasks - completed_tasks}")
-                print(f"Total Habits: {total_habits}")
-                print(f"Total Notes: {total_notes}")
-                print(f"Total Logs: {total_logs}")
-                print()
+                while True:
+                    clear()
+                    total_tasks = len(tasks)
+                    completed_tasks = len([task for task in tasks if task.done == "Complete"])
+                    total_habits = len(habits)
+                    total_notes = len(notes)
+                    total_logs = len(logs)
+                    print("Stats")
+                    print(f"Total Tasks: {total_tasks}")
+                    print(f"Completed Tasks: {completed_tasks}")
+                    print(f"Incomplete Tasks: {total_tasks - completed_tasks}")
+                    print(f"Total Habits: {total_habits}")
+                    print(f"Total Notes: {total_notes}")
+                    print(f"Total Logs: {total_logs}")
+                    print()
+                    print("Stats Menu\n1. Exit")
+                    log_menu_choice = input("Choice: ")
+                    match log_menu_choice:
+                        case "1":
+                            break
+                        case _:
+                            invalid_input()
+                            
 
             case "6":
                 break
 
             case _:
-                print("Invalid Input")
+                invalid_input()
                 pass
 
     data["task"] = [task.to_dict() for task in tasks]
@@ -239,7 +272,6 @@ def main():
     data["log"] = [log.to_dict() for log in logs]
     with open("data.json", "w") as file:
         json.dump(data,file,indent=4)
-        file.close()
 
 
 def add_task(task,priority,tasks):
@@ -268,7 +300,36 @@ def remove_note(i,notes):
 
 def add_log(action,detail,logs):
     logs.append(Log(action,detail,datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    if len(logs) > 100:
+        del logs[0]
 
+def int_validation(prompt,items):
+    try:
+        n = int(input(prompt))
+        if n < 1 or n > len(items):
+            raise ValueError
+        return n
+    except ValueError:
+        invalid_input()
+        return None
+    
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    f = Figlet(font = "standard")
+    print(f.renderText("Productivity System"))
+
+def invalid_input():
+    print("\nInvalid Input!")
+    time.sleep(0.75)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\nExiting...")
+        data["task"] = [task.to_dict() for task in  data["task"]]
+        data["habit"] = [habit.to_dict() for habit in data["habit"]]
+        data["note"] = [note.to_dict() for note in data["note"]]
+        data["log"] = [log.to_dict() for log in data["log"]]
+        with open("data.json", "w") as file:
+            json.dump(data,file,indent=4)
