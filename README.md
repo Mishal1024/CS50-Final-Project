@@ -21,4 +21,34 @@ This application is menu driven and divided into fice sections:
 
 The project uses Object Oriented Programming with four classes namely Task, Habit, Note and Log. Each class stores its own data and provides methods for converting objects into lists for table display and into dictionaries for storing in JSON file.
 
-####Files
+
+Files
+
+project.py
+This is the main project file. It contains all classes, main logic and functions
+
+test_project.py
+This file contains unit tests written to verify that all the functions in the main project file is working properly.
+
+data.json
+This file acts as a database for the program to store all program data persistently.
+
+requirements.txt
+This file contains all the installable libraries that the project requires, one per line, it allows users to install them with the command "pip install -r requirements.txt". It includes pyfiglet for banner and tabulate for table formatting.
+
+
+Design Choices
+
+One of the main design choices in this project was structuring the program using four classes instead of dictionaries.
+
+Another decision was to use JSON for storage instead of plan text. This allowed structured storage and made it easy to expand the project further.
+
+I used tabulate for better appearance and user experience along with pyfiglet. While these are not necessarily functional, they improve usability.
+
+I didn’t like how the terminal output kept getting longer as the program was used, so I implemented a clear() function that clears the screen and reprints the banner. This makes it feel like the application’s state is updating rather than simply appending another response.
+
+I also decided to implement automatic logging system that automatically creates a log and stores it whenever an action that are worth recording takes place. This adds accountability and allows users to review their recent ectivity. To keep storage manageable I limited logs to the most recent 100 entries
+
+In the future, I would like to add deadlines, habit streak tracking, search functionality, and notifications to make the system even more powerful.
+
+This is my final project for CS50P. It brings together the core concepts I learned throughout the course and applied them in a practical way. Building this project helped me improve my understanding of Python and gave me experience designing a program from scratch
