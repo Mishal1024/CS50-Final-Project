@@ -317,7 +317,7 @@ def int_validation(n,items):
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
-    print(f.renderText("Productivity System"))
+    print(f.renderText("Kyzen"))
 
 def invalid_input():
     print("\nInvalid Input!")

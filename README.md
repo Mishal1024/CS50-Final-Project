@@ -1,7 +1,7 @@
-# CLI Productivity System
+# Kyzen
    #### Video Demo:
    #### Description:
-This is a Command Line productivity application build using python. It helps users organize and manage their tasks, habits and notes along with insights into their activity or progress, all within a terminal.
+Kyzen is a Command Line productivity application build using python. It helps users organize and manage their tasks, habits and notes along with insights into their activity or progress, all within a terminal.
 
 The main goal if the project is to create a lightweight personal productivity system that combines multiples tools to help users improve their life.
 
